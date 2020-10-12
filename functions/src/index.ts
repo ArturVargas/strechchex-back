@@ -13,14 +13,20 @@ const db = admin.firestore();
 const app = express();
 app.use(cors({ origin: true }));
 
-app.get('/hello', (req, res) => {
-  res.json({ message: 'Hello World..!!' });
-});
-
 app.get('/test-exercises', async (req, res) => {
+  let collectionList: any = [];
   const exeList = await db.collection('exercices').doc('testExercises');
-  const list = (await exeList.get()).data();
-  res.json({ list });
+  exeList.listCollections().then((collections) => {
+    collections.forEach(collection => {
+      collectionList.push(collection.id);
+    })
+  }).then(() => {
+    res.json({ items: collectionList });
+  })
+  .catch((error) => {
+    console.log(error);
+    res.json({ error });
+  })
 });
 
 app.get('/strech-profile', (req, res) => {
